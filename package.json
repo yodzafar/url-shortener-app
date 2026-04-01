@@ -1,0 +1,12 @@
+{
+  "name": "url-shortener-site",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@tailwindcss/cli": "^4.2.2"
+  }
+}

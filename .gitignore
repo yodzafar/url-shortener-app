@@ -1,0 +1,10 @@
+.env
+tmp/
+bin/
+web/static/css/output.css
+internal/wire/wire_gen.go
+*.db
+
+.DS_Store
+.idea/
+.vscode/
