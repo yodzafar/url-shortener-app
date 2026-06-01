@@ -1,0 +1,17 @@
+{
+  "error.internal": "Внутренняя ошибка сервера",
+  "error.not_found": "Не найдено",
+  "error.method_not_allowed": "Метод не разрешён",
+  "error.bad_request": "Неверный запрос",
+  "error.validation_failed": "Ошибки при заполнении формы",
+  "error.unauthorized": "Не авторизован",
+  "error.user_not_found": "Пользователь не найден",
+  "error.user_exists": "Пользователь уже существует",
+  "error.invalid_credentials": "Неверный email или пароль",
+  "validation.required": "Обязательное поле",
+  "validation.email": "Некорректный формат email",
+  "validation.min": "Минимум {{.Param}} символов",
+  "validation.max": "Максимум {{.Param}} символов",
+  "validation.eqfield": "Должно совпадать с {{.Field}}",
+  "validation.invalid": "Недопустимое значение"
+}

@@ -1,0 +1,17 @@
+{
+  "error.internal": "Internal server error",
+  "error.not_found": "Not found",
+  "error.method_not_allowed": "Method not allowed",
+  "error.bad_request": "Bad request",
+  "error.validation_failed": "Validation failed",
+  "error.unauthorized": "Unauthorized",
+  "error.user_not_found": "User not found",
+  "error.user_exists": "User already exists",
+  "error.invalid_credentials": "Invalid email or password",
+  "validation.required": "This field is required",
+  "validation.email": "Must be a valid email address",
+  "validation.min": "Must be at least {{.Param}} characters",
+  "validation.max": "Must be at most {{.Param}} characters",
+  "validation.eqfield": "Must match {{.Field}}",
+  "validation.invalid": "Invalid value"
+}

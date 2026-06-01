@@ -10,15 +10,16 @@ import (
 )
 
 type Config struct {
-	App     AppConfig
-	DB      DBConfig
-	Server  ServerConfig
-	Session SessionConfig
+	App    AppConfig
+	DB     DBConfig
+	Server ServerConfig
+	Auth   AuthConfig
 }
 
 type AppConfig struct {
-	Env   string
-	Debug bool
+	Env        string
+	Debug      bool
+	LocalesDir string
 }
 
 type DBConfig struct {
@@ -36,9 +37,10 @@ type ServerConfig struct {
 	ShutdownTimeout time.Duration
 }
 
-type SessionConfig struct {
-	TTL        time.Duration
-	CookieName string
+type AuthConfig struct {
+	JWTSecret  string
+	AccessTTL  time.Duration
+	RefreshTTL time.Duration
 }
 
 func Load() (*Config, error) {
@@ -48,8 +50,9 @@ func Load() (*Config, error) {
 
 	cfg := &Config{
 		App: AppConfig{
-			Env:   getEnv("APP_ENV", "development"),
-			Debug: getBoolEnv("APP_DEBUG", false),
+			Env:        getEnv("APP_ENV", "development"),
+			Debug:      getBoolEnv("APP_DEBUG", false),
+			LocalesDir: getEnv("LOCALES_DIR", "locales"),
 		},
 		DB: DBConfig{
 			URL:           mustEnv("DB_URL"),
@@ -64,9 +67,10 @@ func Load() (*Config, error) {
 			WriteTimeout:    getDurationEnv("SERVER_WRITE_TIMEOUT", 30*time.Second),
 			ShutdownTimeout: getDurationEnv("SERVER_SHUTDOWN_TIMEOUT", 10*time.Second),
 		},
-		Session: SessionConfig{
-			TTL:        getDurationEnv("SESSION_TTL", 7*24*time.Hour),
-			CookieName: getEnv("SESSION_COOKIE_NAME", "session_id"),
+		Auth: AuthConfig{
+			JWTSecret:  mustEnv("JWT_SECRET"),
+			AccessTTL:  getDurationEnv("JWT_ACCESS_TTL", 15*time.Minute),
+			RefreshTTL: getDurationEnv("JWT_REFRESH_TTL", 7*24*time.Hour),
 		},
 	}
 
@@ -97,8 +101,8 @@ func (c *Config) validate() error {
 		errs = append(errs, "DB_MAX_CONNS must be greater than or equal to DB_MIN_CONNS")
 	}
 
-	if c.Session.TTL <= time.Minute {
-		errs = append(errs, "SESSION_TTL must be greater than 1 minute")
+	if len(c.Auth.JWTSecret) < 16 {
+		errs = append(errs, "JWT_SECRET must be at least 16 characters")
 	}
 
 	valid := map[string]bool{"development": true, "production": true, "test": true}

@@ -1,0 +1,17 @@
+{
+  "error.internal": "Ichki server xatosi",
+  "error.not_found": "Topilmadi",
+  "error.method_not_allowed": "Metodga ruxsat berilmagan",
+  "error.bad_request": "Noto'g'ri so'rov",
+  "error.validation_failed": "Forma to'ldirishda xatolar bor",
+  "error.unauthorized": "Avtorizatsiyadan o'tilmagan",
+  "error.user_not_found": "Foydalanuvchi topilmadi",
+  "error.user_exists": "Bunday foydalanuvchi allaqachon mavjud",
+  "error.invalid_credentials": "Email yoki parol noto'g'ri",
+  "validation.required": "Bo'sh bo'lishi mumkin emas",
+  "validation.email": "Email noto'g'ri formatda",
+  "validation.min": "Kamida {{.Param}} ta belgi kiriting",
+  "validation.max": "Ko'pi bilan {{.Param}} ta belgi kiriting",
+  "validation.eqfield": "{{.Field}} bilan mos kelishi kerak",
+  "validation.invalid": "Noto'g'ri qiymat"
+}

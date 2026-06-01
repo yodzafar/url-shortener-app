@@ -1,14 +1,14 @@
-inlude .env
+include .env
 
 MIGRATIONS_DIR := $(MIGRATIONS_DIR)
-CSS_INPUT       := ./web/css/input.css
-CSS_OUTPUT      := ./web/static/css/output.css
+SWAG_ENTRY      := cmd/main.go
+SWAG_OUTPUT     := docs
 
 .PHONY: help \
         migrate-up migrate-down migrate-reset \
         migrate-status migrate-version \
         migrate-create \
-        wire generate tailwind tailwind-watch \
+        wire swag \
         run build dev
 
 # ── Help ──────────────────────────────────────────────────────────────────────
@@ -22,8 +22,7 @@ help:
 	@echo "  make migrate-version    - Show the current migration version"
 	@echo "  make migrate-create     - Create a new migration file (usage: make migrate-create name=your_migration_name)"
 	@echo "  make wire               - Generate dependency injection code using Wire"
-	@echo "  make generate           - Generate code (e.g., mocks, clients)"
-	@echo "  make tailwind           - Build Tailwind CSS"
+	@echo "  make swag               - Generate Swagger/OpenAPI docs"
 	@echo "  make run                - Run the application"
 	@echo "  make build              - Build the application"
 	@echo "  make dev                - Run the application in development mode"
@@ -62,16 +61,9 @@ wire:
 	@echo "→ Generating dependency injection code with Wire..."
 	@cd internal/wire && wire
 
-generate:
-	@echo "→ Generating templ code (e.g., mocks, clients)..."
-
-tailwind:
-	@echo "→ Building Tailwind v4 CSS..."
-	@npx @tailwindcss/cli -i $(CSS_INPUT) -o $(CSS_OUTPUT) --minify
-
-tailwind-watch:
-	@echo "→ Watching Tailwind v4 CSS for changes..."
-	@npx @tailwindcss/cli -i $(CSS_INPUT) -o $(CSS_OUTPUT) --watch
+swag:
+	@echo "→ Generating Swagger/OpenAPI docs..."
+	@swag init -g $(SWAG_ENTRY) -o $(SWAG_OUTPUT) --parseInternal
 
 run:
 	@echo "→ Running the application..."
