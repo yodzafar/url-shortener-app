@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strings"
 
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"golang.org/x/text/language"
@@ -18,8 +17,7 @@ var (
 	LangRU = language.Russian
 	LangEN = language.English
 
-	DefaultLang = LangUZ
-	CookieName  = "lang"
+	DefaultLang = LangEN
 )
 
 type Translator struct {
@@ -41,7 +39,8 @@ func New(localesDir string) (*Translator, error) {
 		}
 	}
 
-	matcher := language.NewMatcher([]language.Tag{LangUZ, LangRU, LangEN})
+	// English first → the matcher falls back to English for unsupported locales.
+	matcher := language.NewMatcher([]language.Tag{LangEN, LangRU, LangUZ})
 
 	return &Translator{bundle: bundle, matcher: matcher}, nil
 }
@@ -67,13 +66,6 @@ func T(l *i18n.Localizer, messageID string, templateData ...map[string]any) stri
 }
 
 func (t *Translator) Detect(r *http.Request) Lang {
-	if cookie, err := r.Cookie(CookieName); err == nil {
-		if tag, err := language.Parse(cookie.Value); err == nil {
-			matched, _, _ := t.matcher.Match(tag)
-			return matched
-		}
-	}
-
 	if acceptLang := r.Header.Get("Accept-Language"); acceptLang != "" {
 		tags, _, err := language.ParseAcceptLanguage(acceptLang)
 		if err == nil && len(tags) > 0 {
@@ -83,18 +75,4 @@ func (t *Translator) Detect(r *http.Request) Lang {
 	}
 
 	return DefaultLang
-}
-
-func LangString(tag Lang) string {
-	base, _ := tag.Base()
-	return base.String()
-}
-
-func ParseLang(s string) Lang {
-	tag, err := language.Parse(strings.ToLower(s))
-	if err != nil {
-		return DefaultLang
-	}
-
-	return tag
 }

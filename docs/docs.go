@@ -245,9 +245,6 @@ const docTemplate = `{
                 "token_type": {
                     "description": "always \"Bearer\"",
                     "type": "string"
-                },
-                "user": {
-                    "$ref": "#/definitions/domain.User"
                 }
             }
         },
@@ -281,8 +278,7 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "email",
-                "password",
-                "password_confirm"
+                "password"
             ],
             "properties": {
                 "email": {
@@ -291,9 +287,6 @@ const docTemplate = `{
                 "password": {
                     "type": "string",
                     "minLength": 8
-                },
-                "password_confirm": {
-                    "type": "string"
                 }
             }
         },

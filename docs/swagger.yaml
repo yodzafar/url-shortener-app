@@ -41,8 +41,6 @@ definitions:
       token_type:
         description: always "Bearer"
         type: string
-      user:
-        $ref: '#/definitions/domain.User'
     type: object
   dto.LoginRequest:
     properties:
@@ -68,12 +66,9 @@ definitions:
       password:
         minLength: 8
         type: string
-      password_confirm:
-        type: string
     required:
     - email
     - password
-    - password_confirm
     type: object
   response.ErrorBody:
     properties:

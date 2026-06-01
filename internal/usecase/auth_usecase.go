@@ -98,6 +98,5 @@ func (u *AuthUsecase) issueTokens(user *domain.User) (*dto.AuthResponse, error) 
 		RefreshToken: refresh,
 		TokenType:    "Bearer",
 		ExpiresIn:    int64(time.Until(expiresAt).Seconds()),
-		User:         user,
 	}, nil
 }

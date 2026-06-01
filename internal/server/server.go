@@ -3,7 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -14,11 +14,13 @@ import (
 	"github.com/yodzafar/url-shortener-app/internal/config"
 	"github.com/yodzafar/url-shortener-app/internal/handler"
 	appMiddleware "github.com/yodzafar/url-shortener-app/internal/middleware"
+	"github.com/yodzafar/url-shortener-app/internal/pkg/logger"
 )
 
 type Server struct {
 	echo *echo.Echo
 	cfg  *config.Config
+	log  *slog.Logger
 }
 
 type Handlers struct {
@@ -34,20 +36,24 @@ func New(
 ) *Server {
 	e := echo.New()
 
+	log := logger.New(cfg.App.Env)
+	e.Logger = log         // echo's RequestLogger logs through our handler
+	slog.SetDefault(log)   // default logger for the rest of the app
+
 	e.HTTPErrorHandler = errH.Handle
 
 	e.Use(middleware.Recover())
 	e.Use(middleware.Secure())
 
 	if cfg.IsDevelopment() {
-		e.Use(middleware.RequestLogger())
+		e.Use(langMW.RequestLogger())
 	}
 
 	e.Use(langMW.Handle)
 
 	registerRoutes(e, h, authMW)
 
-	return &Server{echo: e, cfg: cfg}
+	return &Server{echo: e, cfg: cfg, log: log}
 }
 
 // Handler exposes the underlying HTTP handler (useful for in-process testing).
@@ -69,7 +75,10 @@ func (s *Server) Start() error {
 	errCh := make(chan error, 1)
 
 	go func() {
-		log.Printf("→ [%s] http://localhost:%s", s.cfg.App.Env, s.cfg.Server.Port)
+		s.log.Info("server started",
+			"env", s.cfg.App.Env,
+			"addr", fmt.Sprintf("http://localhost:%s", s.cfg.Server.Port),
+		)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			errCh <- err
 		}
@@ -79,7 +88,7 @@ func (s *Server) Start() error {
 	case err := <-errCh:
 		return fmt.Errorf("server: %w", err)
 	case sig := <-quit:
-		log.Printf("→ signal %v, shutting down ...", sig)
+		s.log.Warn("shutting down", "signal", sig.String())
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), s.cfg.Server.ShutdownTimeout)
@@ -89,7 +98,7 @@ func (s *Server) Start() error {
 		return fmt.Errorf("graceful shutdown: %v", err)
 	}
 
-	log.Println("→ server stopped")
+	s.log.Info("server stopped")
 
 	return nil
 }

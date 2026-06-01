@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"errors"
-	"log"
+	"log/slog"
 	"net/http"
 
 	"github.com/labstack/echo/v5"
@@ -29,10 +29,14 @@ func (h *ErrorHandler) Handle(c *echo.Context, err error) {
 		return
 	}
 
-	appErr := h.toAppError(err)
+	appErr := toAppError(err)
 
 	if appErr.Status >= http.StatusInternalServerError {
-		log.Printf("error: %s %s -> %v", c.Request().Method, c.Request().URL.Path, err)
+		slog.Error("request failed",
+			"method", c.Request().Method,
+			"path", c.Request().URL.Path,
+			"error", err,
+		)
 	}
 
 	localizer := GetLocalizer(c)
@@ -51,14 +55,14 @@ func (h *ErrorHandler) Handle(c *echo.Context, err error) {
 	}
 
 	if writeErr := c.JSON(appErr.Status, body); writeErr != nil {
-		log.Printf("error: writing response: %v", writeErr)
+		slog.Error("writing error response", "error", writeErr)
 	}
 }
 
 // toAppError normalizes any error into a translatable AppError. Our own domain
 // errors keep their specific message; echo's HTTP errors (404, 405, ...) are
 // mapped to a code/message by their status code; everything else is a 500.
-func (h *ErrorHandler) toAppError(err error) *apperror.AppError {
+func toAppError(err error) *apperror.AppError {
 	var appErr *apperror.AppError
 	if errors.As(err, &appErr) {
 		return appErr
