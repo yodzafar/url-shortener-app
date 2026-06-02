@@ -1,44 +1,15 @@
 basePath: /
 definitions:
-  domain.User:
-    properties:
-      birthdate:
-        type: string
-      createdAt:
-        type: string
-      email:
-        type: string
-      firstName:
-        type: string
-      gender:
-        $ref: '#/definitions/domain.gender'
-      id:
-        type: string
-      isActive:
-        type: boolean
-      lastName:
-        type: string
-      middleName:
-        type: string
-    type: object
-  domain.gender:
-    enum:
-    - male
-    - female
-    type: string
-    x-enum-varnames:
-    - GenderMale
-    - GenderFemale
   dto.AuthResponse:
     properties:
-      access_token:
+      accessToken:
         type: string
-      expires_in:
+      expiresIn:
         description: access-token lifetime in seconds
         type: integer
-      refresh_token:
+      refreshToken:
         type: string
-      token_type:
+      tokenType:
         description: always "Bearer"
         type: string
     type: object
@@ -54,10 +25,10 @@ definitions:
     type: object
   dto.RefreshRequest:
     properties:
-      refresh_token:
+      refreshToken:
         type: string
     required:
-    - refresh_token
+    - refreshToken
     type: object
   dto.RegisterRequest:
     properties:
@@ -69,6 +40,70 @@ definitions:
     required:
     - email
     - password
+    type: object
+  dto.UpdateRoleRequest:
+    properties:
+      role:
+        enum:
+        - admin
+        - user
+        type: string
+    required:
+    - role
+    type: object
+  dto.UpdateUserRequest:
+    properties:
+      birthdate:
+        type: string
+      firstName:
+        maxLength: 100
+        type: string
+      gender:
+        enum:
+        - male
+        - female
+        type: string
+      isActive:
+        type: boolean
+      lastName:
+        maxLength: 100
+        type: string
+      middleName:
+        maxLength: 100
+        type: string
+    type: object
+  dto.UserResponse:
+    properties:
+      birthdate:
+        type: string
+      createdAt:
+        type: string
+      email:
+        type: string
+      firstName:
+        type: string
+      gender:
+        type: string
+      id:
+        type: string
+      isActive:
+        type: boolean
+      lastName:
+        type: string
+      middleName:
+        type: string
+      role:
+        type: string
+    type: object
+  response.Envelope:
+    properties:
+      data: {}
+      error:
+        $ref: '#/definitions/response.ErrorBody'
+      meta:
+        $ref: '#/definitions/response.Meta'
+      success:
+        type: boolean
     type: object
   response.ErrorBody:
     properties:
@@ -83,7 +118,26 @@ definitions:
       message:
         type: string
     type: object
-host: localhost:8080
+  response.Meta:
+    properties:
+      pagination:
+        $ref: '#/definitions/response.Pagination'
+    type: object
+  response.Pagination:
+    properties:
+      hasNext:
+        type: boolean
+      hasPrevious:
+        type: boolean
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      totalItems:
+        type: integer
+      totalPages:
+        type: integer
+    type: object
 info:
   contact: {}
   description: REST API for the URL shortener service.
@@ -129,7 +183,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/domain.User'
+            $ref: '#/definitions/dto.UserResponse'
         "401":
           description: Unauthorized
           schema:
@@ -199,9 +253,210 @@ paths:
       summary: Register a new user
       tags:
       - auth
-schemes:
-- http
-- https
+  /users:
+    get:
+      description: Returns a paginated list of users.
+      parameters:
+      - description: Page number (default 1)
+        in: query
+        name: page
+        type: integer
+      - description: Page size (default 20, max 100)
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.UserResponse'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorBody'
+      security:
+      - BearerAuth: []
+      summary: List users
+      tags:
+      - users
+  /users/{id}:
+    delete:
+      description: Soft-deletes a user by ID.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Envelope'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorBody'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorBody'
+      security:
+      - BearerAuth: []
+      summary: Delete a user
+      tags:
+      - users
+    get:
+      description: Returns a single user by ID.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UserResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorBody'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorBody'
+      security:
+      - BearerAuth: []
+      summary: Get a user
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: Updates a user's profile fields.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Profile fields
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UserResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorBody'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorBody'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/response.ErrorBody'
+      security:
+      - BearerAuth: []
+      summary: Update a user
+      tags:
+      - users
+  /users/{id}/role:
+    put:
+      consumes:
+      - application/json
+      description: Assigns a role (admin or user) to a user. Admin only.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Role
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateRoleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UserResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorBody'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.ErrorBody'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorBody'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/response.ErrorBody'
+      security:
+      - BearerAuth: []
+      summary: Set a user's role
+      tags:
+      - users
+  /users/me:
+    put:
+      consumes:
+      - application/json
+      description: Updates the authenticated user's own profile.
+      parameters:
+      - description: Profile fields
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UserResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorBody'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/response.ErrorBody'
+      security:
+      - BearerAuth: []
+      summary: Update own profile
+      tags:
+      - users
 securityDefinitions:
   BearerAuth:
     description: Type "Bearer" followed by a space and the JWT access token.

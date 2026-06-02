@@ -8,7 +8,7 @@ SWAG_OUTPUT     := docs
         migrate-up migrate-down migrate-reset \
         migrate-status migrate-version \
         migrate-create \
-        wire swag \
+        wire swag grant-admin \
         run build dev
 
 # ── Help ──────────────────────────────────────────────────────────────────────
@@ -23,6 +23,7 @@ help:
 	@echo "  make migrate-create     - Create a new migration file (usage: make migrate-create name=your_migration_name)"
 	@echo "  make wire               - Generate dependency injection code using Wire"
 	@echo "  make swag               - Generate Swagger/OpenAPI docs"
+	@echo "  make grant-admin        - Promote/create an admin (usage: make grant-admin email=user@example.com [password=secret])"
 	@echo "  make run                - Run the application"
 	@echo "  make build              - Build the application"
 	@echo "  make dev                - Run the application in development mode"
@@ -64,6 +65,11 @@ wire:
 swag:
 	@echo "→ Generating Swagger/OpenAPI docs..."
 	@swag init -g $(SWAG_ENTRY) -o $(SWAG_OUTPUT) --parseInternal
+
+grant-admin:
+	@if [ -z "$(email)" ]; then echo "❌  Usage: make grant-admin email=user@example.com [password=secret] "; exit 1; fi
+	@echo "→ Granting admin to $(email)..."
+	@go run cmd/grantadmin/main.go -email $(email) -password "$(password)"
 
 run:
 	@echo "→ Running the application..."

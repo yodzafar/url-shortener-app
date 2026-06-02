@@ -13,9 +13,7 @@ import (
 //	@version		1.0
 //	@description	REST API for the URL shortener service.
 
-//	@host		localhost:8080
 //	@BasePath	/
-//	@schemes	http https
 
 //	@securityDefinitions.apikey	BearerAuth
 //	@in							header

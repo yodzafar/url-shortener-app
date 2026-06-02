@@ -4,7 +4,6 @@ import (
 	"github.com/labstack/echo/v5"
 
 	"github.com/yodzafar/url-shortener-app/internal/apperror"
-	"github.com/yodzafar/url-shortener-app/internal/domain"
 	"github.com/yodzafar/url-shortener-app/internal/dto"
 	appMiddleware "github.com/yodzafar/url-shortener-app/internal/middleware"
 	"github.com/yodzafar/url-shortener-app/internal/pkg/response"
@@ -119,10 +118,9 @@ func (h *AuthHandler) Refresh(c *echo.Context) error {
 //	@Tags			auth
 //	@Produce		json
 //	@Security		BearerAuth
-//	@Success		200	{object}	domain.User
+//	@Success		200	{object}	dto.UserResponse
 //	@Failure		401	{object}	response.ErrorBody
 //	@Router			/auth/me [get]
 func (h *AuthHandler) Me(c *echo.Context) error {
-	var user *domain.User = appMiddleware.GetUser(c)
-	return response.OK(c, user)
+	return response.OK(c, dto.NewUserResponse(appMiddleware.GetUser(c)))
 }

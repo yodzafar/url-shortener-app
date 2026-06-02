@@ -37,10 +37,12 @@ var ValidationSet = wire.NewSet(
 
 var UsecaseSet = wire.NewSet(
 	usecase.NewAuthUsecase,
+	usecase.NewUserUsecase,
 )
 
 var HandlerSet = wire.NewSet(
 	handler.NewAuthHandler,
+	handler.NewUserHandler,
 	provideHandlers,
 )
 
@@ -74,8 +76,9 @@ func provideTranslator(cfg *config.Config) (*appi18n.Translator, error) {
 	return appi18n.New(cfg.App.LocalesDir)
 }
 
-func provideHandlers(auth *handler.AuthHandler) server.Handlers {
+func provideHandlers(auth *handler.AuthHandler, user *handler.UserHandler) server.Handlers {
 	return server.Handlers{
 		Auth: auth,
+		User: user,
 	}
 }

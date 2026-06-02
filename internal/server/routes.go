@@ -11,6 +11,7 @@ import (
 func registerRoutes(e *echo.Echo, h Handlers, authMW *appMiddleware.AuthMiddleware) {
 	routes.Home(e)
 	routes.Auth(e, h.Auth, authMW)
+	routes.User(e, h.User, authMW)
 
 	// Swagger UI: http://localhost:<port>/swagger/index.html
 	e.GET("/swagger/*", echo.WrapHandler(httpSwagger.Handler(

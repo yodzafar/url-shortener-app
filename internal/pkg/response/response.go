@@ -37,11 +37,11 @@ type Meta struct {
 // Pagination is the standard list pagination block.
 type Pagination struct {
 	Page        int  `json:"page"`
-	PageSize    int  `json:"page_size"`
-	TotalItems  int  `json:"total_items"`
-	TotalPages  int  `json:"total_pages"`
-	HasNext     bool `json:"has_next"`
-	HasPrevious bool `json:"has_previous"`
+	PageSize    int  `json:"pageSize"`
+	TotalItems  int  `json:"totalItems"`
+	TotalPages  int  `json:"totalPages"`
+	HasNext     bool `json:"hasNext"`
+	HasPrevious bool `json:"hasPrevious"`
 }
 
 // OK writes a 200 success envelope.

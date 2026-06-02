@@ -25,6 +25,7 @@ type Server struct {
 
 type Handlers struct {
 	Auth *handler.AuthHandler
+	User *handler.UserHandler
 }
 
 func New(
@@ -44,6 +45,7 @@ func New(
 
 	e.Use(middleware.Recover())
 	e.Use(middleware.Secure())
+	e.Use(middleware.CORS("*"))
 
 	if cfg.IsDevelopment() {
 		e.Use(langMW.RequestLogger())

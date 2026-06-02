@@ -63,6 +63,7 @@ const (
 	CodeBadRequest       = "BAD_REQUEST"
 	CodeValidation       = "VALIDATION_ERROR"
 	CodeUnauthorized     = "UNAUTHORIZED"
+	CodeForbidden        = "FORBIDDEN"
 	CodeUserNotFound     = "USER_NOT_FOUND"
 	CodeUserExists       = "USER_EXISTS"
 	CodeInvalidCreds     = "INVALID_CREDENTIALS"
@@ -76,6 +77,7 @@ const (
 	MsgBadRequest         = "error.bad_request"
 	MsgValidationFailed   = "error.validation_failed"
 	MsgUnauthorized       = "error.unauthorized"
+	MsgForbidden          = "error.forbidden"
 	MsgUserNotFound       = "error.user_not_found"
 	MsgUserExists         = "error.user_exists"
 	MsgInvalidCredentials = "error.invalid_credentials"
@@ -89,6 +91,11 @@ func Validation(details map[string][]string) *AppError {
 // Unauthorized builds a 401 error.
 func Unauthorized() *AppError {
 	return New(http.StatusUnauthorized, CodeUnauthorized, MsgUnauthorized)
+}
+
+// Forbidden builds a 403 error (authenticated but not allowed).
+func Forbidden() *AppError {
+	return New(http.StatusForbidden, CodeForbidden, MsgForbidden)
 }
 
 // BadRequest builds a 400 error (e.g. malformed JSON body).
@@ -117,6 +124,8 @@ func From(err error) *AppError {
 		return New(http.StatusUnauthorized, CodeInvalidCreds, MsgInvalidCredentials).Wrap(err)
 	case errors.Is(err, domain.ErrUnauthorized):
 		return New(http.StatusUnauthorized, CodeUnauthorized, MsgUnauthorized).Wrap(err)
+	case errors.Is(err, domain.ErrForbidden):
+		return New(http.StatusForbidden, CodeForbidden, MsgForbidden).Wrap(err)
 	default:
 		return New(http.StatusInternalServerError, CodeInternal, MsgInternal).Wrap(err)
 	}

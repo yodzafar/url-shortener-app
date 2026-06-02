@@ -5,6 +5,7 @@
   "error.bad_request": "Noto'g'ri so'rov",
   "error.validation_failed": "Forma to'ldirishda xatolar bor",
   "error.unauthorized": "Avtorizatsiyadan o'tilmagan",
+  "error.forbidden": "Ruxsat yo'q",
   "error.user_not_found": "Foydalanuvchi topilmadi",
   "error.user_exists": "Bunday foydalanuvchi allaqachon mavjud",
   "error.invalid_credentials": "Email yoki parol noto'g'ri",

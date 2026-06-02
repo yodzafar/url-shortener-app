@@ -5,6 +5,7 @@
   "error.bad_request": "Неверный запрос",
   "error.validation_failed": "Ошибки при заполнении формы",
   "error.unauthorized": "Не авторизован",
+  "error.forbidden": "Доступ запрещён",
   "error.user_not_found": "Пользователь не найден",
   "error.user_exists": "Пользователь уже существует",
   "error.invalid_credentials": "Неверный email или пароль",
